@@ -40,10 +40,12 @@ jobs:
     strategy:
       matrix:
         include:
-          # - service: gift
-          #   name: gift service
-          - service: order
-            name: order service
+          - name: gift service
+            service: gift
+            package: loyalty
+          - name: order service
+            service: order
+            package: order
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,7 +71,7 @@ jobs:
 
       - name: Remove the rest
         working-directory: source/${{ secrets.SERVICE_PACKAGE_PATH }}
-        run: rm -rf loyalty
+        run: find . ! -name 'main' ! -name '${{ matrix.package }}' -type f -exec rm -f {} + 
 
       - name: Build and package project
         working-directory: source
@@ -87,7 +89,6 @@ jobs:
         run: |
           git config user.name "GitHub Actions" --local
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
-          git status
           git add -A
           git commit -m ':white_check_mark: update code'
           git push origin main
