@@ -74,6 +74,8 @@ jobs:
           mkdir backup
           mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* backup
           mv backup/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv backup/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
 
       - name: Build and package project
