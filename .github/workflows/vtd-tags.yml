@@ -1,0 +1,50 @@
+name: VTD BE PPAP
+
+on:
+  repository_dispatch:
+    types:
+      - vtd-trigger
+      - tag-**
+
+env:
+  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
+  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
+  REF_NAME: ${{ github.event.client_payload.ref_name}}
+  TAG_NAME: ${{ github.event.client_payload.tag_name}}
+  TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
+
+jobs:
+  build-and-check:
+    name: ${{ matrix.name }}
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: Gift service
+            service: gift
+            package: loyalty
+          - name: Order service
+            service: order
+            package: order
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
+          token: ${{ secrets.GH_PAT }}
+          ref: main
+
+      - name: Switch branch
+        run: |
+          git fetch --all 
+          git switch -c ${{ env.REF_NAME }}
+          git pull origin ${{ env.REF_NAME }}
+
+      - name: Push result
+        run: |
+          git config user.name "GitHub Actions" --local
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
+          git tag -a ${{ env.TAG_NAME }} -m 'Bump version to ${{ env.TAG_NAME }}' 
+          git push origin ${{ env.TAG_NAME }}
