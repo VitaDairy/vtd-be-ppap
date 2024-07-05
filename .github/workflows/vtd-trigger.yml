@@ -1,4 +1,4 @@
-name: VTD BE PPAP
+name: VTD trigger
 
 on:
   repository_dispatch:
