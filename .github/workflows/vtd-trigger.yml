@@ -70,7 +70,11 @@ jobs:
 
       - name: Build and package project
         working-directory: source
-        run: mvn -f pom.xml clean package
+        run: mvn -f pom.xml clean package -q
+
+      - name: Check 
+        working-directory: target
+        run: ls
 
       - name: Move code to the target
         run: |
@@ -80,4 +84,4 @@ jobs:
 
       - name: Check 
         working-directory: target
-        run: git status
+        run: ls && git status
