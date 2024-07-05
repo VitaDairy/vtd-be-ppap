@@ -39,7 +39,7 @@ jobs:
       - name: Switch branch
         run: |
           git fetch --all 
-          git switch -c ${{ env.REF_NAME }}
+          git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git pull origin ${{ env.REF_NAME }}
 
       - name: Push result
