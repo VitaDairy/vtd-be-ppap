@@ -1,4 +1,4 @@
-name: VTD Tag
+name: vtd tag
 
 on:
   repository_dispatch:
