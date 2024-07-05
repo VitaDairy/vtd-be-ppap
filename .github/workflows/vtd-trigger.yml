@@ -1,14 +1,9 @@
 name: VTD BE PPAP
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
   repository_dispatch:
     types:
       - vtd-trigger
-      - v*
 
 env:
   # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
