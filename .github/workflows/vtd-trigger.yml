@@ -69,8 +69,8 @@ jobs:
       - name: Build and package project
         working-directory: source
         run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > application-dev-base64.properties
-          cat application-dev-base64.properties | base64 -d > application-dev.properties
+          echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
+          cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
           mvn -f pom.xml clean install package -q
 
       - name: Move code to the result
