@@ -14,16 +14,16 @@ env:
 
 jobs:
   build-and-check:
-    name: Build and check ${{ matrix.name }}
+    name: ${{ matrix.name }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
-          - name: gift service
+          - name: Gift service
             service: gift
             package: loyalty
-          - name: order service
+          - name: Order service
             service: order
             package: order
     steps:
