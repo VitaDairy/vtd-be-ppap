@@ -25,28 +25,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.VTD_REPOSITORY }}
+          repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
           token: ${{ secrets.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
 
   build-and-check:
-    name: Build ans check
+    name: Build and check ${{ matrix.name }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: [pre-deployment]
     strategy:
       matrix:
         include:
-          - service: "loyalty"
-          - service: "order"
+          # - service: gift
+          #   name: gift service
+          - service: order
+            name: order service
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: ${{ secrets.VTD_REPOSITORY }}
+          repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
           token: ${{ secrets.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
           path: source
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
+          token: ${{ secrets.GH_PAT }}
+          ref: main
+          path: target
 
       - name: Setup java 21
         uses: actions/setup-java@v4
@@ -61,3 +71,13 @@ jobs:
       - name: Build and package project
         working-directory: source
         run: mvn -f pom.xml clean package
+
+      - name: Move code to the target
+        run: |
+          rm source/.git
+          cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
+          mv source/* target/*
+
+      - name: Check 
+        working-directory: target
+        run: git status
