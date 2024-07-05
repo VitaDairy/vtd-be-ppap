@@ -74,7 +74,7 @@ jobs:
 
       - name: Move code to the target
         run: |
-          rm source/.git
+          rm -rf source/.git
           cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
           mv source/* target/*
 
