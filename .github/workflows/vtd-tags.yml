@@ -42,7 +42,7 @@ jobs:
         with:
           repository: ${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           token: ${{ secrets.GH_PAT }}
-          ref: ma${{ env.REF_NAME }}n
+          ref: ${{ env.REF_NAME }}
           path: target
 
       - name: Setup java 21
