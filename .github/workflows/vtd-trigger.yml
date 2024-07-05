@@ -84,7 +84,7 @@ jobs:
           rm -rf source/.git
           mv target/.git source/.git
           rm -rf target/*
-          mv source/ target/
+          mv -v source/* target/
 
       - name: Check
         working-directory: target
