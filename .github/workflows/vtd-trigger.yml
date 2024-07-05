@@ -83,8 +83,9 @@ jobs:
         run: |
           rm -rf source/.git
           mv target/.git source/.git
+          rm -rf target/*
           mv source/ target/
-          
+
       - name: Check
         working-directory: target
         run: ls -la && git status
