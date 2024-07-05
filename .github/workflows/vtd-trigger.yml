@@ -78,7 +78,7 @@ jobs:
       - name: Move code to the target
         run: |
           mkdir result
-          mv target/.git result
+          mv target/.git result/
           rm -rf source/.git
           mv -v source/* result/
 
