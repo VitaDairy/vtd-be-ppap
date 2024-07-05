@@ -58,7 +58,7 @@ jobs:
           path: target
 
       - name: Switch branch
-        if: steps.target-branch.outputs.value != 'main'
+        if: steps.target-branch.outputs.value == 'main'
         working-directory: target
         run: |
           git branch --delete -D ${{ env.REF_NAME }} || echo 'done!!!'
