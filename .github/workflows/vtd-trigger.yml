@@ -70,8 +70,11 @@ jobs:
           java-version: "21"
 
       - name: Remove the rest
-        working-directory: source/${{ secrets.SERVICE_PACKAGE_PATH }}
-        run: find . ! -name 'main' ! -name '${{ matrix.package }}' -type f -exec rm -f {} + 
+        run: |
+          mdkir backup
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* backup
+          mv backup/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
 
       - name: Build and package project
         working-directory: source
