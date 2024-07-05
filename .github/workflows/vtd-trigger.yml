@@ -55,8 +55,9 @@ jobs:
           java-version: "21"
 
       - name: Remove the rest
-        working-directory: source/${{ secrets.MAIN_PATH }}
+        working-directory: source/${{ secrets.SERVICE_PACKAGE_PATH }}
         run: rm -rf loyalty
 
       - name: Build and package project
+        working-directory: source
         run: mvn -f pom.xml clean install package
