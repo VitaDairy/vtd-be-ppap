@@ -28,3 +28,35 @@ jobs:
           repository: ${{ secrets.VTD_REPOSITORY }}
           token: ${{ secrets.GH_PAT }}
           ref: ${{ github.event.client_payload.ref_name}}
+
+  build-and-check:
+    name: Build ans check
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: [pre-deployment]
+    strategy:
+      matrix:
+        include:
+          - service: "loyalty"
+          - service: "order"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ github.event.client_payload.ref_name}}
+          path: source
+
+      - name: Setup java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Remove the rest
+        working-directory: source/${{ secrets.MAIN_PATH }}
+        run: rm -rf loyalty
+
+      - name: Build and package project
+        run: mvn -f pom.xml clean install package
