@@ -47,12 +47,12 @@ jobs:
 
       - name: Remove the rest
         run: |
-          mkdir backup
-          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* backup
-          mv backup/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv backup/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv backup/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv backup/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mkdir temp
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* temp
+          mv temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
 
       - name: Build and package project
         working-directory: source
