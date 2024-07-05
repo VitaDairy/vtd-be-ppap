@@ -69,7 +69,7 @@ jobs:
       - name: Build and package project
         working-directory: source
         run: |
-          echo "$GCP_CREDENTIALS" > application-dev-base64.properties
+          echo "${{ secrets.ENV_PROPERTIES }}" > application-dev-base64.properties
           cat application-dev-base64.properties | base64 -d > application-dev.properties
           mvn -f pom.xml clean install package -q
 
