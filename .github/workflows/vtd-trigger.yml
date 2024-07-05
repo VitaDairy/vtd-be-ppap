@@ -74,7 +74,7 @@ jobs:
 
       - name: Check
         working-directory: target
-        run: ls -la
+        run: ls -la && git status
 
       - name: Move code to the target
         run: |
