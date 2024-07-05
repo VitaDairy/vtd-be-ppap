@@ -29,22 +29,60 @@ jobs:
             service: order
             package: order
     steps:
-      - name: Checkout
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ env.TAG_NAME }}
+          path: source
+
+      - name: Checkout target
         uses: actions/checkout@v4
         with:
           repository: ${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           token: ${{ secrets.GH_PAT }}
           ref: main
+          path: target
 
       - name: Switch branch
+        working-directory: target
         run: |
           git fetch --all 
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git pull origin ${{ env.REF_NAME }}
 
+      - name: Remove the rest
+        run: |
+          mkdir backup
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* backup
+          mv backup/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv backup/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+
+      - name: Build and package project
+        working-directory: source
+        run: |
+          echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
+          cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
+          mvn -f pom.xml clean install package -q
+
+      - name: Move code to the result
+        run: |
+          mkdir result
+          mv target/.git result/
+          rm -rf source/.git
+          shopt -s dotglob
+          mv -v source/* result/
+
       - name: Push result
+        working-directory: result
         run: |
           git config user.name "GitHub Actions" --local
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
+          git add -A
+          git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
+          git push origin ${{ env.REF_NAME }}
           git tag -a ${{ env.TAG_NAME }} -m 'Bump version to ${{ env.TAG_NAME }}' 
           git push origin ${{ env.TAG_NAME }}
