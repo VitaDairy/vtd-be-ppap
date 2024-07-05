@@ -87,5 +87,5 @@ jobs:
           git config user.name "GitHub Actions" --local
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
           git add -A
-          git commit --no-verify -m ':white_check_mark: update code'
+          git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
           git push origin ${{ env.REF_NAME }}
