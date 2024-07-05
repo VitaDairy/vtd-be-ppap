@@ -18,25 +18,10 @@ env:
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
 
 jobs:
-  pre-deployment:
-    name: Pre Deployment
-    runs-on: ubuntu-latest
-    # outputs:
-    #   matrix: ${{ steps.set-matrix.outputs.value }}
-    #   message-information: ${{ steps.get-message-information.outputs.value }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
-          token: ${{ secrets.GH_PAT }}
-          ref: ${{ github.event.client_payload.ref_name}}
-
   build-and-check:
     name: Build and check ${{ matrix.name }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    needs: [pre-deployment]
     strategy:
       matrix:
         include:
