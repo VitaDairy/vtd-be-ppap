@@ -42,10 +42,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          if git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} then
-            echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT
-          else
+          HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }})
+          if [ -z "${HASH_REF}" ]; then
             echo "value=main" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout target
