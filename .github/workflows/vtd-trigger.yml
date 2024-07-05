@@ -3,7 +3,8 @@ name: VTD BE PPAP
 on:
   repository_dispatch:
     types:
-      - vtd-trigger-**
+      - vtd-trigger
+      - sync-**
 
 env:
   # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
