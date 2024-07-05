@@ -72,9 +72,9 @@ jobs:
         working-directory: source
         run: mvn -f pom.xml clean package -q
 
-      - name: Check 
+      - name: Check
         working-directory: target
-        run: ls
+        run: ls -la
 
       - name: Move code to the target
         run: |
@@ -82,6 +82,6 @@ jobs:
           cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
           mv source/ target/
 
-      - name: Check 
+      - name: Check
         working-directory: target
-        run: ls && git status
+        run: ls -la && git status
