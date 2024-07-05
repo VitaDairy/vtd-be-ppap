@@ -27,6 +27,11 @@ jobs:
             service: order
             package: order
     steps:
+      - name: run
+        run: | 
+          echo ${{ env.REF_NAME }}
+          echo ${{ env.TRIGGERING_ACTOR }}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
