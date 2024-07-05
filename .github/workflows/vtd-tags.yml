@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types:
       - vtd-trigger
-      - sync-tag/**
+      - refs/tags/**
 
 env:
   # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
