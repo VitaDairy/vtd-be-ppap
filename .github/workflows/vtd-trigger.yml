@@ -46,7 +46,7 @@ jobs:
 
       - name: Switch branch
         working-directory: target
-        run: | 
+        run: |
           git fetch --all 
           git switch -c ${{ env.REF_NAME }}
           git pull origin ${{ env.REF_NAME }}
@@ -87,6 +87,5 @@ jobs:
           git config user.name "GitHub Actions" --local
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
           git add -A
-          SILENT_LOG=$(git commit -m ':white_check_mark: update code')
+          git commit --no-verify -m ':white_check_mark: update code'
           git push origin ${{ env.REF_NAME }}
-          echo $SILENT_LOG
