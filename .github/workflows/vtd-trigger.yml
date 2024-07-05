@@ -71,7 +71,7 @@ jobs:
 
       - name: Remove the rest
         run: |
-          mdkir backup
+          mkdir backup
           mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* backup
           mv backup/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv backup/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
