@@ -76,7 +76,7 @@ jobs:
         run: |
           rm -rf source/.git
           cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
-          mv source/* target/*
+          mv source/ target/
 
       - name: Check 
         working-directory: target
