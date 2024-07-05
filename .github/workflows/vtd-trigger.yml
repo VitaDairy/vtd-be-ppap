@@ -82,7 +82,7 @@ jobs:
       - name: Move code to the target
         run: |
           rm -rf source/.git
-          mv target/.git source/.git
+          mv target/.git source/
           rm -rf target/*
           mv -v source/* target/
 
