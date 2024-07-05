@@ -85,4 +85,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
           git add -A
           git commit -m ':white_check_mark: update code'
-          git push origin ${{ env.REF_NAME }}
+          SILENT_LOG=$(git push origin ${{ env.REF_NAME }})
+          echo $SILENT_LOG
