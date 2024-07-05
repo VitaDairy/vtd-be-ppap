@@ -2,9 +2,9 @@ name: VTD BE PPAP
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+    push:
+      branches:
+        - main
   repository_dispatch:
     types:
       - vtd-trigger
@@ -82,8 +82,8 @@ jobs:
       - name: Move code to the target
         run: |
           rm -rf source/.git
-          cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
-
+          # cd target && find . ! -name '.git' -type f -exec rm -f {} + && cd ..
+          # mv source/ target/
       - name: Check
         working-directory: target
         run: ls -la && git status
