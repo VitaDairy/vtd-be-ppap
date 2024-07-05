@@ -72,6 +72,7 @@ jobs:
           mkdir result
           mv target/.git result/
           rm -rf source/.git
+          shopt -s dotglob
           mv -v source/* result/
 
       - name: Push result
