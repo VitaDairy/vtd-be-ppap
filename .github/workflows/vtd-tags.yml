@@ -48,6 +48,7 @@ jobs:
       - name: Switch branch
         working-directory: target
         run: |
+          git branch --delete -D ${{ env.REF_NAME }} || echo 'done!!!'
           git fetch --all 
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git pull origin ${{ env.REF_NAME }}
@@ -57,7 +58,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-          
+
       - name: Remove the rest
         run: |
           mkdir backup
