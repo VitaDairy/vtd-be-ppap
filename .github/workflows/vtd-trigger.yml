@@ -20,13 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - name: Gift service
-            service: gift
-            package: loyalty
-          - name: Order service
-            service: order
-            package: order
+        include: ${{ fromJson(vars.STRATEGY_MAXTRIX_SERVICES) }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
