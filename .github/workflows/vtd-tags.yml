@@ -51,6 +51,7 @@ jobs:
           git branch --delete -D ${{ env.REF_NAME }} || echo 'done!!!'
           git fetch --all 
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
+          git config pull.rebase false
           git pull origin ${{ env.REF_NAME }}
 
       - name: Setup java 21
