@@ -28,11 +28,6 @@ jobs:
             service: order
             package: order
     steps:
-      - name: run
-        run: | 
-          echo ${{ env.REF_NAME }}
-          echo ${{ env.TRIGGERING_ACTOR }}
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -48,6 +43,10 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: main
           path: target
+
+      - name: Switch branch
+        working-directory: target
+        run: git fetch --all && git switch -c aBranch
 
       - name: Setup java 21
         uses: actions/setup-java@v4
