@@ -56,7 +56,7 @@ jobs:
         working-directory: target
         run: |
           git branch --delete -D ${{ env.REF_NAME }} || echo 'done!!!'
-          git fetch --all 
+          git fetch --all --quiet
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git reset --hard ${{ env.REF_NAME }}
           git pull origin ${{ env.REF_NAME }}
