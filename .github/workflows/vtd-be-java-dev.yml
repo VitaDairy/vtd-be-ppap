@@ -1,0 +1,31 @@
+name: vtd trigger
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - vtd-trigger
+      - refs/remotes/**
+
+env:
+  GKE_CLUSTER: vitadairy-k8s-dev
+  # GCP_PROJECT_ID: ${{secrets.GCP_PROJECT_DEV_ID}}
+  GKE_ZONE: asia-southeast1-b
+  DEPLOYMENT_NAME: vitadairy-java-loyalty-be
+  GAR_HOST: asia-southeast1-docker.pkg.dev
+  GAR_NAME: vtd-dev
+  IMAGE_NAME: vitadairy-java-loyalty-be
+  IMAGE_TAG: ${{ github.sha }}
+  SPRING_PROFILES_ACTIVE: dev
+
+jobs:
+  setup-build-publish-deploy:
+    environment: DEV
+    name: Setup build publish deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: SH
+        run: echo ${{ vars.SPRING_PROFILES_ACTIVE }}
