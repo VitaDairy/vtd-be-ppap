@@ -15,22 +15,24 @@ env:
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
   TRIGGERING_REF: ${{ github.event.client_payload.triggering_ref}}
   TRIGGERING_REPOSITORY: ${{ github.event.client_payload.triggering_repo}}
+  TRIGGERING_SERVICE_NAME: ${{ github.event.client_payload.triggering_service_name}}
 
 jobs:
   setup-build-publish-deploy:
-    environment: ${{  github.event.client_payload.triggering_env }}
+    # environment: DEV
+    environment: ${{ github.event.client_payload.triggering_env }}
     env:
-      GKE_CLUSTER: vitadairy-k8s-dev
+      GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
       GCP_PROJECT_ID: ${{secrets.GCP_PROJECT_ID}}
-      GKE_ZONE: asia-southeast1-b
-      DEPLOYMENT_NAME: vitadairy-java-loyalty-be
-      GAR_HOST: asia-southeast1-docker.pkg.dev
-      GAR_NAME: vtd-dev
-      IMAGE_NAME: vitadairy-java-loyalty-be
+      GKE_ZONE: ${{ secrets.GKE_ZONE }}
+      DEPLOYMENT_NAME: ${{ secrets.DEPLOYMENT_IMAGE_NAME }}${{ github.event.client_payload.triggering_service_name }}
+      GAR_HOST: ${{ secrets.GAR_HOST }}
+      GAR_NAME: ${{ secrets.GAR_NAME }}
+      IMAGE_NAME: ${{ secrets.DEPLOYMENT_IMAGE_NAME }}${{ github.event.client_payload.triggering_service_name }}
       IMAGE_TAG: ${{ github.sha }}
       ENV_PROPERTIES: ${{secrets.ENV_PROPERTIES }}
       # GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-      SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
+      SPRING_PROFILES_ACTIVE: ${{ github.event.client_payload.triggering_env }}
       
     name: Setup build publish deploy
     runs-on: ubuntu-latest
