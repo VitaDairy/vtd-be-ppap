@@ -104,7 +104,7 @@ jobs:
         run: |
           TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
           TRIGGERING_REF=${{ env.REF_NAME }}
-          TRIGGERING_SERVICE_NAME=${{ matrix.name }}
+          TRIGGERING_SERVICE_NAME=${{ matrix.package }}
           TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
           curl -L \`
