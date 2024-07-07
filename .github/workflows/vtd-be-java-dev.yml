@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - vtd-trigger
-      - refs/remotes/**
+      - vtd-be-java-dev
 
 env:
   GKE_CLUSTER: vitadairy-k8s-dev
