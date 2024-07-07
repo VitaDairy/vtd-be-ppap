@@ -107,7 +107,7 @@ jobs:
           TRIGGERING_SERVICE_NAME=${{ matrix.package }}
           TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
-          curl -L \`
+          curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.LIBERTY_PPAP_PAT }}" \
