@@ -1,4 +1,4 @@
-name: vtd trigger
+name: vtd be java dev
 
 on:
   workflow_dispatch:
