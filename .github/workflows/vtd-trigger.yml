@@ -101,6 +101,7 @@ jobs:
           git push origin ${{ env.REF_NAME }} -f
 
       - name: Trigger build ${{ matrix.service }}
+        working-directory: result
         run: |
           TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
           TRIGGERING_REF=${{ env.REF_NAME }}
