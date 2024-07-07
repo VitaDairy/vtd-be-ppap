@@ -4,21 +4,34 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types:
-      - vtd-be-java-dev
+      - vtd-be-java-**
+      - vtd-be-java-**
+      - vtd-be-java-**
 
+env:
+  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
+  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
+  # REF_NAME: ${{ github.event.client_payload.ref_name}}
+  # TAG_NAME: ${{ github.event.client_payload.tag_name}}
+  TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
+  TRIGGERING_REF: ${{ github.event.client_payload.triggering_ref}}
+  TRIGGERING_REPOSITORY: ${{ github.event.client_payload.triggering_repo}}
 
 jobs:
   setup-build-publish-deploy:
-    environment: DEV
+    environment: ${{  github.event.client_payload.triggering_env }}
     env:
       GKE_CLUSTER: vitadairy-k8s-dev
-      # GCP_PROJECT_ID: ${{secrets.GCP_PROJECT_ID}}
+      GCP_PROJECT_ID: ${{secrets.GCP_PROJECT_ID}}
       GKE_ZONE: asia-southeast1-b
       DEPLOYMENT_NAME: vitadairy-java-loyalty-be
       GAR_HOST: asia-southeast1-docker.pkg.dev
       GAR_NAME: vtd-dev
       IMAGE_NAME: vitadairy-java-loyalty-be
       IMAGE_TAG: ${{ github.sha }}
+      ENV_PROPERTIES: ${{secrets.ENV_PROPERTIES }}
+      # GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
       
     name: Setup build publish deploy
@@ -26,6 +39,60 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TRIGGERING_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ env.TRIGGERING_REF }}
+      
+      # - name: Authen GCP
+      #   uses: "google-github-actions/auth@v2"
+      #   with:
+      #     credentials_json: "${{ env. GCP_SERVICE_ACCOUNT_KEY}}"
+
+      # - name: Setup GCP
+      #   uses: google-github-actions/setup-gcloud@v2
+
+      # - name: Configuration
+      #   run: |
+      #     # Get GKE credentials
+      #     gcloud components install gke-gcloud-auth-plugin
+      #     export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+      #     gcloud container clusters get-credentials $GKE_CLUSTER --zone=$GKE_ZONE
+
+      #     # Configure Docker
+      #     gcloud auth configure-docker --quiet
+      #     gcloud auth configure-docker $GAR_HOST --quiet
+
+      - name: Setup java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Build and package project
+        run: |
+          echo "${{ env.ENV_PROPERTIES }}" > src/main/resources/application-base64.properties
+          cat src/main/resources/application-base64.properties | base64 -d > src/main/resources/application-${{ env.SPRING_PROFILES_ACTIVE }}.properties
+          mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml
+
+      - name: Build Docker Image
+        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      # - name: Push Docker Image to Artifact Registry
+      #   run: |-
+      #     docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
+      #     docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
+
+      # - name: Update Deployment image URL
+      #   run: |
+      #     sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/dev/deployment.yaml
+
+      # - name: Debug deployment.yaml after update
+      #   run: cat overlays/dev/deployment.yaml
+
+      # - name: Deploy to GKE
+      #   run: |
+      #     kubectl apply -R -f overlays/dev
 
       - name: SH
         run: echo ${{ env.SPRING_PROFILES_ACTIVE }}
