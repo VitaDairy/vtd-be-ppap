@@ -15,7 +15,7 @@ env:
   TRIGGERING_REF: ${{ github.event.client_payload.triggering_ref}}
   TRIGGERING_REPOSITORY: ${{ github.event.client_payload.triggering_repo}}
   TRIGGERING_SERVICE_NAME: ${{ github.event.client_payload.triggering_service_name}}
-
+  TRIGGERING_VERSION: ${{ github.event.client_payload.triggering_version}}
 jobs:
   setup-build-publish-deploy:
     # environment: DEV
@@ -41,7 +41,7 @@ jobs:
         with:
           repository: ${{ env.TRIGGERING_REPOSITORY }}
           token: ${{ secrets.GH_PAT }}
-          ref: ${{ env.TRIGGERING_REF }}
+          ref: ${{ env.TRIGGERING_VERSION }}
       
       # - name: Authen GCP
       #   uses: "google-github-actions/auth@v2"
@@ -75,7 +75,7 @@ jobs:
           mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml
 
       - name: Build Docker Image
-        run: docker build -t $IMAGE_NAME:1.0.0 .
+        run: docker build -t $IMAGE_NAME:${{ env.TRIGGERING_VERSION }} .
         # run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
       # - name: Push Docker Image to Artifact Registry
@@ -93,6 +93,3 @@ jobs:
       # - name: Deploy to GKE
       #   run: |
       #     kubectl apply -R -f overlays/dev
-
-      - name: SH
-        run: echo ${{ env.SPRING_PROFILES_ACTIVE }}
