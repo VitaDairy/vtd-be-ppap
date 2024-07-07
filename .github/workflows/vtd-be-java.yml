@@ -29,7 +29,7 @@ jobs:
       GAR_HOST: ${{ secrets.GAR_HOST }}
       GAR_NAME: ${{ secrets.GAR_NAME }}
       IMAGE_NAME: ${{ secrets.DEPLOYMENT_IMAGE_NAME }}${{ github.event.client_payload.triggering_service_name }}
-      IMAGE_TAG: ${{ github.sha }}
+      # IMAGE_TAG: ${{ github.sha }}
       ENV_PROPERTIES: ${{secrets.ENV_PROPERTIES }}
       # GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
       SPRING_PROFILES_ACTIVE: ${{ github.event.client_payload.triggering_env }}
@@ -76,7 +76,8 @@ jobs:
           mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml
 
       - name: Build Docker Image
-        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+        run: docker build -t $IMAGE_NAME:1.0.0 .
+        # run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
       # - name: Push Docker Image to Artifact Registry
       #   run: |-
