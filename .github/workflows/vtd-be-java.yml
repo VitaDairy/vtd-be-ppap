@@ -1,4 +1,4 @@
-name: vtd be java dev
+name: vtd be java
 
 on:
   workflow_dispatch:
