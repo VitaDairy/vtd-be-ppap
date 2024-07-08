@@ -48,14 +48,6 @@ jobs:
       - name: Setup GCP
         uses: google-github-actions/setup-gcloud@v2
 
-      # - name: Authen GCP
-      #   uses: "google-github-actions/auth@v1"
-      #   with:
-      #     credentials_json: "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}"
-
-      # - name: Setup GCP
-      #   uses: google-github-actions/setup-gcloud@v1
-
       - name: Configuration
         run: |
           # Get GKE credentials
@@ -81,6 +73,9 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      - name: RUN
+        run: docker images
 
       # - name: Push Docker Image to Artifact Registry
       #   run: |
