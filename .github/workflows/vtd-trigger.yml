@@ -98,6 +98,7 @@ jobs:
           mv -v source/* result/
 
       - name: Check changes
+        working-directory: result
         id: is-change-code
         run: |
           if [[ `git status --porcelain` ]]; then
@@ -107,7 +108,7 @@ jobs:
           fi
 
       - name: Push result
-        # if: steps.is-change-code.outputs.value == 'true'
+        if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
           git config user.name "GitHub Actions" --local
@@ -117,7 +118,7 @@ jobs:
           git push origin ${{ env.REF_NAME }} -f
 
       - name: Trigger build ${{ matrix.service }}
-        # if: steps.is-change-code.outputs.value == 'true'
+        if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
           TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
