@@ -16,7 +16,7 @@ env:
   TRIGGERING_VERSION: ${{ github.event.client_payload.triggering_version}}
   GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
   IMAGE_TAG: ${{ github.event.client_payload.triggering_version}}
-  GCP_PROJECT_ID: ${{secrets.GCP_PROJECT_ID}}
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
   DEPLOYMENT_NAME: ${{ secrets.DEPLOYMENT_IMAGE_NAME }}${{ github.event.client_payload.triggering_service_name }}
   GAR_HOST: ${{ secrets.GAR_HOST }}
@@ -84,7 +84,7 @@ jobs:
 
       - name: Update Deployment image URL
         run: |
-          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/deployment.yaml.yaml
+          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/deployment.yaml
 
       - name: Deploy to GKE
         run: |
