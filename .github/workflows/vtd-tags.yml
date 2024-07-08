@@ -45,14 +45,20 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Remove the rest
+      - name: Remove the rest code
         run: |
-          mkdir temp
-          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* temp
-          mv temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mkdir code_temp
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_temp
+          mv code_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+
+      - name: Remove the rest overlays
+        run: |
+          mkdir overlay_temp
+          mv -v source/overlays/* overlay_temp
+          mv overlay_temp/${{ matrix.service }} source/overlays/
 
       - name: Build and package project
         working-directory: source
