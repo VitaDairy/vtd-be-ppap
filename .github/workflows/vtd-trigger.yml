@@ -111,7 +111,7 @@ jobs:
         run: |
           TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
           TRIGGERING_REF=${{ env.REF_NAME }}
-          TRIGGERING_SERVICE_NAME=${{ matrix.package }}
+          TRIGGERING_SERVICE_NAME=${{ matrix.service }}
           TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
           TRIGHERING_VERSION=$(git rev-parse HEAD)
