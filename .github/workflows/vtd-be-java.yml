@@ -84,8 +84,8 @@ jobs:
 
       - name: Update Deployment image URL
         run: |
-          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/dev/deployment.yaml.yaml
+          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/deployment.yaml.yaml
 
       - name: Deploy to GKE
         run: |
-          kubectl apply -R -f overlays/${{ env.TRIGGERING_SERVICE_NAME }}/dev
+          kubectl apply -R -f overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}
