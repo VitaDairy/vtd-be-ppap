@@ -97,7 +97,17 @@ jobs:
           shopt -s dotglob
           mv -v source/* result/
 
+      - name: Check changes
+        id: is-change-code
+        run: |
+          if [[ `git status --porcelain` ]]; then
+            echo "value=true" >> $GITHUB_OUTPUT
+          else
+            echo "value=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Push result
+        if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
           git config user.name "GitHub Actions" --local
@@ -107,6 +117,7 @@ jobs:
           git push origin ${{ env.REF_NAME }} -f
 
       - name: Trigger build ${{ matrix.service }}
+        if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
           TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
