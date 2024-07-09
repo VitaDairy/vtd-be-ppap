@@ -148,7 +148,7 @@ jobs:
   build_swagger:
     permissions:
       contents: write
-    name: "Swagger documentation generated"
+    name: "Swagger docs generated"
     needs: [build-and-check]
     runs-on: ubuntu-latest
     steps:
