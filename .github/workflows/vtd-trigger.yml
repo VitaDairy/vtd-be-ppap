@@ -18,6 +18,8 @@ jobs:
     name: ${{ matrix.name }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
     strategy:
       matrix:
         include: ${{ fromJson(vars.STRATEGY_MAXTRIX_SERVICES) }}
@@ -176,7 +178,7 @@ jobs:
     - name: Generate Swagger UI
       uses: Legion2/swagger-ui-action@v1
       with:
-        output: swagger-ui
+        output: swagger-ui/${{ needs.build-and-check.outputs.env }}
         spec-file: source/target/generated-sources/swagger.json
     
     - name: Deploy to GitHub Pages
