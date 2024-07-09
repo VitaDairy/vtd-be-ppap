@@ -47,12 +47,19 @@ jobs:
 
       - name: Remove the rest code
         run: |
-          mkdir code_temp
-          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_temp
-          mv code_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mkdir code_package_temp
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_package_temp
+          mv code_package_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_package_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_package_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_package_temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+
+      - name: Remove the test packages
+        run: |
+          mkdir test_package_temp
+          mv -v source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/* test_package_temp
+          mv test_package_temp/main source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/
+          mv test_package_temp/${{ matrix.package }} source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/
 
       - name: Remove the rest overlays
         run: |
