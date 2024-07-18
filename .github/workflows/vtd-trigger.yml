@@ -77,7 +77,7 @@ jobs:
           mv code_temp/auth source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_temp/${{ matrix.package }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
 
       - name: Remove the rest overlays
         run: |
