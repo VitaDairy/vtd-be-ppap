@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJson(vars.STRATEGY_MAXTRIX_SERVICES) }}
+        include: ${{ fromJson(vars.STRATEGY_MATRIX_SERVICES) }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
