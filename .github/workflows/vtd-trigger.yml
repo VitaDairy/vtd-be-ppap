@@ -84,7 +84,11 @@ jobs:
           mkdir overlay_temp
           mv -v source/overlays/* overlay_temp
           mv overlay_temp/${{ matrix.service }} source/overlays/
-
+      
+      - name: Change server.servlet.context-path
+        working-directory: source
+        run: perl -i -pe "s/^server.servlet.context-path=\/api/'server.servlet.context-path=${{ matrix.path }}'/e" src/main/resources/application.properties
+        
       - name: Build and package project
         working-directory: source
         run: |
