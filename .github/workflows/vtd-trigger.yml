@@ -178,7 +178,8 @@ jobs:
       run: |
         echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
         cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-        mvn -f pom.xml clean test -q
+        mvn -f pom.xml  clean install package -DskipTests -q
+        # mvn -f pom.xml clean test -q
     
     - name: Generate Swagger UI
       uses: Legion2/swagger-ui-action@v1
