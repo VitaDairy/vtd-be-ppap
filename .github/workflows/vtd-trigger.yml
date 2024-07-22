@@ -85,9 +85,9 @@ jobs:
           mv -v source/overlays/* overlay_temp
           mv overlay_temp/${{ matrix.service }} source/overlays/
       
-      - name: Change server.servlet.context-path
+      - name: Change micro.service.context-path
         working-directory: source
-        run: perl -i -pe "s/^server.servlet.context-path=\/api/'server.servlet.context-path=${{ matrix.path }}'/e" src/main/resources/application.properties
+        run: perl -i -pe "s/^micro.service.context-path=\/api/'micro.service.context-path=${{ matrix.path }}'/e" src/main/resources/application.properties
         
       - name: Build and package project
         working-directory: source
