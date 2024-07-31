@@ -51,6 +51,7 @@ jobs:
           mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_package_temp
           mv code_package_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_package_temp/auth source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_package_temp/zoo source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_package_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_package_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_package_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
