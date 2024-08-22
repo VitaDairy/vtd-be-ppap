@@ -1,4 +1,4 @@
-name: vtd trigger
+name: vtd trigger sup
 
 on:
   repository_dispatch:
@@ -53,6 +53,18 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: ${{ steps.target-branch.outputs.value }}
           path: target
+
+      - name: Clone properties file
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_ENV }}
+          token: ${{ secrets.GH_PAT }}
+          path: env
+
+      - name: Switch profile
+        run: |
+          sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" src/main/resources/application.properties
+          mv env/v4-java/application-ci.properties source/src/main/resources/application-ci.properties
 
       - name: Switch branch
         if: steps.target-branch.outputs.value == 'main'
@@ -116,80 +128,40 @@ jobs:
             echo "value=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Push result
-        if: steps.is-change-code.outputs.value == 'true'
-        working-directory: result
-        run: |
-          git config user.name "GitHub Actions" --local
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
-          git add -A
-          git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
-          git push origin ${{ env.REF_NAME }} -f
+      # - name: Push result
+      #   if: steps.is-change-code.outputs.value == 'true'
+      #   working-directory: result
+      #   run: |
+      #     git config user.name "GitHub Actions" --local
+      #     git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
+      #     git add -A
+      #     git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
+      #     git push origin ${{ env.REF_NAME }} -f
 
-      - name: Trigger build ${{ matrix.service }}
-        if: steps.is-change-code.outputs.value == 'true'
-        working-directory: result
-        run: |
-          TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
-          TRIGGERING_REF=${{ env.REF_NAME }}
-          TRIGGERING_SERVICE_NAME=${{ matrix.service }}
-          TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
-          TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
-          TRIGHERING_VERSION=$(git rev-parse HEAD)
-          curl -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.LIBERTY_PPAP_PAT }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/VitaDairy/vtd-be-ppap/dispatches \
-            -d "{ \
-                \"event_type\": \"vtd-be-java-${{ matrix.service }}/refs/remotes/$TRIGGERING_REF~$TRIGGERING_ACTOR\", \
-                \"client_payload\": { \
-                  \"triggering_actor\": \"$TRIGGERING_ACTOR\", \
-                  \"triggering_ref\": \"$TRIGGERING_REF\", \
-                  \"triggering_service_name\": \"$TRIGGERING_SERVICE_NAME\", \
-                  \"triggering_repo\": \"$TRIGGERING_REPOSITORY\", \
-                  \"triggering_env\": \"$TRIGGERING_ENV\", \
-                  \"triggering_version\": \"$TRIGHERING_VERSION\" \
-                } \
-              }"
-
-  # build_swagger:
-  #   permissions:
-  #     contents: write
-  #   name: "Swagger docs generated"
-  #   needs: [build-and-check]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout source
-  #     uses: actions/checkout@v4
-  #     with:
-  #       repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
-  #       token: ${{ secrets.GH_PAT }}
-  #       ref: ${{ env.REF_NAME }}
-  #       path: source
-    
-  #   - name: Setup java 21
-  #     uses: actions/setup-java@v4
-  #     with:
-  #       distribution: "temurin"
-  #       java-version: "21"
-
-  #   - name: Build and package project
-  #     working-directory: source
-  #     run: |
-  #       echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
-  #       cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-  #       mvn -f pom.xml clean test -q
-    
-  #   - name: Generate Swagger UI
-  #     uses: Legion2/swagger-ui-action@v1
-  #     with:
-  #       output: swagger-ui/${{ needs.build-and-check.outputs.env }}
-  #       spec-file: source/target/generated-sources/swagger.json
-    
-  #   - name: Deploy to GitHub Pages
-  #     uses: peaceiris/actions-gh-pages@v4
-  #     with:
-  #       github_token: ${{ secrets.GITHUB_TOKEN }}
-  #       publish_dir: swagger-ui
+      # - name: Trigger build ${{ matrix.service }}
+      #   if: steps.is-change-code.outputs.value == 'true'
+      #   working-directory: result
+      #   run: |
+      #     TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
+      #     TRIGGERING_REF=${{ env.REF_NAME }}
+      #     TRIGGERING_SERVICE_NAME=${{ matrix.service }}
+      #     TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
+      #     TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
+      #     TRIGHERING_VERSION=$(git rev-parse HEAD)
+      #     curl -L \
+      #       -X POST \
+      #       -H "Accept: application/vnd.github+json" \
+      #       -H "Authorization: Bearer ${{ secrets.LIBERTY_PPAP_PAT }}" \
+      #       -H "X-GitHub-Api-Version: 2022-11-28" \
+      #       https://api.github.com/repos/VitaDairy/vtd-be-ppap/dispatches \
+      #       -d "{ \
+      #           \"event_type\": \"vtd-be-java-${{ matrix.service }}/refs/remotes/$TRIGGERING_REF~$TRIGGERING_ACTOR\", \
+      #           \"client_payload\": { \
+      #             \"triggering_actor\": \"$TRIGGERING_ACTOR\", \
+      #             \"triggering_ref\": \"$TRIGGERING_REF\", \
+      #             \"triggering_service_name\": \"$TRIGGERING_SERVICE_NAME\", \
+      #             \"triggering_repo\": \"$TRIGGERING_REPOSITORY\", \
+      #             \"triggering_env\": \"$TRIGGERING_ENV\", \
+      #             \"triggering_version\": \"$TRIGHERING_VERSION\" \
+      #           } \
+      #         }"
