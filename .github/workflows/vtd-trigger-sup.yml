@@ -63,7 +63,7 @@ jobs:
 
       - name: Switch profile
         run: |
-          sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" src/main/resources/application.properties
+          sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" source/src/main/resources/application.properties
           mv env/v4-java/application-ci.properties source/src/main/resources/application-ci.properties
 
       - name: Switch branch
