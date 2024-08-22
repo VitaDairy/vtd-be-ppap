@@ -40,6 +40,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }})
+          echo $HASH_REF
           if [ -z "${HASH_REF}" ]; then
             echo "value=main" >> $GITHUB_OUTPUT
           else
@@ -127,7 +128,7 @@ jobs:
           else
             echo "value=false" >> $GITHUB_OUTPUT
           fi
-
+      # TODO: rollback application.properties before push
       # - name: Push result
       #   if: steps.is-change-code.outputs.value == 'true'
       #   working-directory: result
