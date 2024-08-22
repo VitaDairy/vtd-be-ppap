@@ -4,7 +4,8 @@ on:
   repository_dispatch:
     types:
       - vtd-trigger
-      - refs/remotes/**
+      - refs/remotes/main
+      # - refs/remotes/**
 
 env:
   # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
