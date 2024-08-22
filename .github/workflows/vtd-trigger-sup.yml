@@ -40,7 +40,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git main
-          git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }}
+          git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo 'error'
           # HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }})
           # echo $HASH_REF
           # if [ -z "${HASH_REF}" ]; then
