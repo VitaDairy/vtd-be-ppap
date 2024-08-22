@@ -1,15 +1,12 @@
-name: vtd trigger
+name: vtd trigger sup
 
 on:
   repository_dispatch:
     types:
       - vtd-trigger
-      - refs/remotes/**
+      # - refs/remotes/**
 
 env:
-  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
-  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
   REF_NAME: ${{ github.event.client_payload.ref_name}}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
 
@@ -38,11 +35,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }})
+          HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo '' )
           if [ -z "${HASH_REF}" ]; then
             echo "value=main" >> $GITHUB_OUTPUT
           else
-            echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT
+            echo "value=stg/0.0.x" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout target
@@ -53,6 +50,18 @@ jobs:
           ref: ${{ steps.target-branch.outputs.value }}
           path: target
 
+      - name: Clone properties file
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_ENV }}
+          token: ${{ secrets.GH_PAT }}
+          path: env
+
+      - name: Switch profile
+        run: |
+          sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" source/src/main/resources/application.properties
+          mv env/v4-java/application-ci.properties source/src/main/resources/application-ci.properties
+
       - name: Switch branch
         if: steps.target-branch.outputs.value == 'main'
         working-directory: target
@@ -61,7 +70,7 @@ jobs:
           git fetch --all --quiet
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git reset --hard ${{ env.REF_NAME }}
-          git pull origin ${{ env.REF_NAME }}
+          git pull origin ${{ env.REF_NAME }} || echo 'done!!!'
 
       - name: Setup java 21
         uses: actions/setup-java@v4
@@ -92,10 +101,7 @@ jobs:
         
       - name: Build and package project
         working-directory: source
-        run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
-          cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-          mvn -f pom.xml clean install package -DskipTests -q
+        run: mvn -f pom.xml clean install package -DskipTests -q
 
       - name: Move code to the result
         run: |
@@ -104,6 +110,7 @@ jobs:
           rm -rf source/.git
           shopt -s dotglob
           mv -v source/* result/
+          sed -i "s|spring.profiles.active=ci|spring.profiles.active=local|g" result/src/main/resources/application.properties
 
       - name: Check changes
         working-directory: result
@@ -152,43 +159,3 @@ jobs:
                   \"triggering_version\": \"$TRIGHERING_VERSION\" \
                 } \
               }"
-
-  # build_swagger:
-  #   permissions:
-  #     contents: write
-  #   name: "Swagger docs generated"
-  #   needs: [build-and-check]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout source
-  #     uses: actions/checkout@v4
-  #     with:
-  #       repository: ${{ secrets.VTD_REPOSITORY_SOURCE }}
-  #       token: ${{ secrets.GH_PAT }}
-  #       ref: ${{ env.REF_NAME }}
-  #       path: source
-    
-  #   - name: Setup java 21
-  #     uses: actions/setup-java@v4
-  #     with:
-  #       distribution: "temurin"
-  #       java-version: "21"
-
-  #   - name: Build and package project
-  #     working-directory: source
-  #     run: |
-  #       echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
-  #       cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-  #       mvn -f pom.xml clean test -q
-    
-  #   - name: Generate Swagger UI
-  #     uses: Legion2/swagger-ui-action@v1
-  #     with:
-  #       output: swagger-ui/${{ needs.build-and-check.outputs.env }}
-  #       spec-file: source/target/generated-sources/swagger.json
-    
-  #   - name: Deploy to GitHub Pages
-  #     uses: peaceiris/actions-gh-pages@v4
-  #     with:
-  #       github_token: ${{ secrets.GITHUB_TOKEN }}
-  #       publish_dir: swagger-ui
