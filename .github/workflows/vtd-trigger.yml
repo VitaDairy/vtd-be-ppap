@@ -7,9 +7,6 @@ on:
       - refs/remotes/**
 
 env:
-  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
-  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
   REF_NAME: ${{ github.event.client_payload.ref_name}}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
 
