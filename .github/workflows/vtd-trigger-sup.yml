@@ -114,6 +114,7 @@ jobs:
           rm -rf source/.git
           shopt -s dotglob
           mv -v source/* result/
+          sed -i "s|spring.profiles.active=ci|spring.profiles.active=local|g" result/src/main/resources/application.properties
 
       - name: Check changes
         working-directory: result
@@ -124,12 +125,11 @@ jobs:
           else
             echo "value=false" >> $GITHUB_OUTPUT
           fi
-      # TODO: rollback application.properties before push
+
       - name: Push result
         if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
-          sed -i "s|spring.profiles.active=ci|spring.profiles.active=local|g" src/main/resources/application.properties
           git config user.name "GitHub Actions" --local
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
           git add -A
