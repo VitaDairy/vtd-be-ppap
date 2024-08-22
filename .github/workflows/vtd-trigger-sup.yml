@@ -74,7 +74,7 @@ jobs:
           git fetch --all --quiet
           git switch -c ${{ env.REF_NAME }} || echo 'already!!!'
           git reset --hard ${{ env.REF_NAME }}
-          git pull origin ${{ env.REF_NAME }}
+          git pull origin ${{ env.REF_NAME }} || echo 'done!!!'
 
       - name: Setup java 21
         uses: actions/setup-java@v4
