@@ -105,10 +105,7 @@ jobs:
         
       - name: Build and package project
         working-directory: source
-        run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
-          cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-          mvn -f pom.xml clean install package -DskipTests -q
+        run: mvn -f pom.xml clean install package -DskipTests -q
 
       - name: Move code to the result
         run: |
@@ -128,15 +125,16 @@ jobs:
             echo "value=false" >> $GITHUB_OUTPUT
           fi
       # TODO: rollback application.properties before push
-      # - name: Push result
-      #   if: steps.is-change-code.outputs.value == 'true'
-      #   working-directory: result
-      #   run: |
-      #     git config user.name "GitHub Actions" --local
-      #     git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
-      #     git add -A
-      #     git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
-      #     git push origin ${{ env.REF_NAME }} -f
+      - name: Push result
+        if: steps.is-change-code.outputs.value == 'true'
+        working-directory: result
+        run: |
+          sed -i "s|spring.profiles.active=ci|spring.profiles.active=local|g" src/main/resources/application.properties
+          git config user.name "GitHub Actions" --local
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" --local
+          git add -A
+          git diff-index --quiet HEAD || git commit -m ':white_check_mark: update code'
+          git push origin ${{ env.REF_NAME }} -f
 
       # - name: Trigger build ${{ matrix.service }}
       #   if: steps.is-change-code.outputs.value == 'true'
