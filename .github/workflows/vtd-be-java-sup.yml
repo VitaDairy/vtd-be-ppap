@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: ${{ env.TRIGGERING_VERSION }}
 
-      - name: Clone ci properties file
+      - name: Clone properties file
         uses: actions/checkout@v4
         with:
           repository: ${{ secrets.VTD_REPOSITORY_ENV }}
