@@ -6,9 +6,6 @@ on:
       - vtd-be-java-**
 
 env:
-  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
-  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
   TRIGGERING_REF: ${{ github.event.client_payload.triggering_ref}}
   TRIGGERING_REPOSITORY: ${{ github.event.client_payload.triggering_repo}}
@@ -29,7 +26,7 @@ jobs:
     env:
       GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
       GAR_NAME: ${{ secrets.GAR_NAME }}
-      
+
     name: Setup build publish deploy
     runs-on: ubuntu-latest
     steps:
@@ -39,7 +36,20 @@ jobs:
           repository: ${{ env.TRIGGERING_REPOSITORY }}
           token: ${{ secrets.GH_PAT }}
           ref: ${{ env.TRIGGERING_VERSION }}
-      
+
+      - name: Clone properties file
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_ENV }}
+          sparse-checkout: v4-java/application-${{ github.event.client_payload.triggering_env }}.properties
+          path: temp/vtd-be-env/
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Switch profile
+        run: |
+          sed -i "s|spring.profiles.active=local|spring.profiles.active=${{ github.event.client_payload.triggering_env }}|g" src/main/resources/application.properties
+          mv temp/vtd-be-env/v4-java/application-${{ github.event.client_payload.triggering_env }}.properties src/main/resources/application-${{ github.event.client_payload.triggering_env }}.properties
+
       - name: Authen GCP
         uses: "google-github-actions/auth@v2"
         with:
@@ -66,10 +76,7 @@ jobs:
           java-version: "21"
 
       - name: Build and package project
-        run: |
-          echo "${{ env.ENV_PROPERTIES }}" > src/main/resources/application-base64.properties
-          cat src/main/resources/application-base64.properties | base64 -d > src/main/resources/application-${{ env.SPRING_PROFILES_ACTIVE }}.properties
-          mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml -DskipTests -q
+        run: mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml -DskipTests -q
 
       - name: Build Docker Image
         run: docker build -t $IMAGE_NAME:$IMAGE_TAG . && docker images
