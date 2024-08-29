@@ -123,7 +123,7 @@ jobs:
           fi
 
       - name: Push result
-        if: steps.is-change-code.outputs.value == 'true'
+        # if: steps.is-change-code.outputs.value == 'true'
         working-directory: result
         run: |
           git config user.name "GitHub Actions" --local
