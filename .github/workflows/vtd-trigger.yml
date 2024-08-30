@@ -82,14 +82,18 @@ jobs:
         run: |
           mkdir code_temp
           mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_temp
-          mv -v source/${{ secrets.SERVICE_DBCHANGE_RESOURCES_PATH }}/.* code_temp/resources
           mv code_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/auth source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/zoo source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_temp/resources/${{ matrix.service }} source/${{ secrets.SERVICE_DBCHANGE_RESOURCES_PATH }}/          
+      
+      - name: cleanup dbchange
+        run: |
+          mkdir dbchange_temp
+          mv -v source/src/main/resources/dbchange/* dbchange_temp
+          mv dbchange_temp/${{ matrix.service }} source/src/main/resources/dbchange/
 
       - name: Remove the rest overlays
         run: |
