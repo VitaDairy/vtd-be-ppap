@@ -91,9 +91,11 @@ jobs:
       
       - name: cleanup dbchange
         run: |
-          mkdir dbchange_temp
-          mv -v source/src/main/resources/dbchange/* dbchange_temp
-          mv dbchange_temp/${{ matrix.service }} source/src/main/resources/dbchange/
+          if [ -d "source/src/main/resources/dbchange" ]; then
+            mkdir dbchange_temp
+            mv -v source/src/main/resources/dbchange/* dbchange_temp
+            mv dbchange_temp/${{ matrix.service }} source/src/main/resources/dbchange/          
+          fi
 
       - name: Remove the rest overlays
         run: |
