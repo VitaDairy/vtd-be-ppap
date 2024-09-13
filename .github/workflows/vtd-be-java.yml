@@ -11,8 +11,8 @@ env:
   TRIGGERING_REPOSITORY: ${{ github.event.client_payload.triggering_repo}}
   TRIGGERING_SERVICE_NAME: ${{ github.event.client_payload.triggering_service_name}}
   TRIGGERING_VERSION: ${{ github.event.client_payload.triggering_version}}
+  TRIGGERING_HASH: ${{ github.event.client_payload.triggering_hash}}
   GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
-  IMAGE_TAG: ${{ github.event.client_payload.triggering_version}}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
   DEPLOYMENT_NAME: ${{ secrets.DEPLOYMENT_IMAGE_NAME }}${{ github.event.client_payload.triggering_service_name }}
@@ -35,7 +35,7 @@ jobs:
         with:
           repository: ${{ env.TRIGGERING_REPOSITORY }}
           token: ${{ secrets.GH_PAT }}
-          ref: ${{ env.TRIGGERING_VERSION }}
+          ref: ${{ env.TRIGGERING_HASH }}
 
       - name: Clone properties file
         uses: actions/checkout@v4
@@ -79,19 +79,21 @@ jobs:
         run: mvn -B package -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE --file pom.xml -DskipTests -q
 
       - name: Build Docker Image
-        run: docker build -t $IMAGE_NAME:$IMAGE_TAG . && docker images
+        run: docker build -t $IMAGE_NAME:$TRIGGERING_VERSION . && docker images
 
       - name: Push Docker Image to Artifact Registry
         run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
-          docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
-          docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$TRIGGERING_VERSION $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$TRIGGERING_VERSION
+          docker tag $IMAGE_NAME:$TRIGGERING_VERSION $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$TRIGGERING_HASH
+          docker tag $IMAGE_NAME:$TRIGGERING_VERSION $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
+          docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$TRIGGERING_VERSION
+          docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$TRIGGERING_HASH
           docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
           
       - name: Update Deployment image URL
         if: github.event.client_payload.triggering_env != 'prd'
         run: |
-          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/*.yaml
+          sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$TRIGGERING_VERSION|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/*.yaml
 
       - name: Deploy to GKE
         if: github.event.client_payload.triggering_env != 'prd'

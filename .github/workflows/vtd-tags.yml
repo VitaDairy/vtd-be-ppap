@@ -112,6 +112,8 @@ jobs:
           TRIGGERING_REF=${{ env.REF_NAME }}
           TRIGGERING_SERVICE_NAME=${{ matrix.service }}
           TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
+          TRIGGERING_ENV=prd
+          TRIGHERING_HASH=$(git rev-parse HEAD)
           curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
@@ -125,7 +127,8 @@ jobs:
                   \"triggering_ref\": \"$TRIGGERING_REF\", \
                   \"triggering_service_name\": \"$TRIGGERING_SERVICE_NAME\", \
                   \"triggering_repo\": \"$TRIGGERING_REPOSITORY\", \
-                  \"triggering_env\": \"prd\", \
-                  \"triggering_version\": \"$TAG_NAME\" \
+                  \"triggering_env\": \"$TRIGGERING_ENV\", \
+                  \"triggering_version\": \"$TAG_NAME\", \
+                  \"triggering_hash\": \"$TRIGHERING_HASH\" \
                 } \
               }"
