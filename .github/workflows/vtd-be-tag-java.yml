@@ -1,9 +1,9 @@
-name: vtd be java tag
+name: vtd be tag java
 
 on:
   repository_dispatch:
     types:
-      - vtd-be-java-tag-**
+      - vtd-be-tag-java-**
 
 env:
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
