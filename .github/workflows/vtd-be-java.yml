@@ -89,9 +89,11 @@ jobs:
           docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
           
       - name: Update Deployment image URL
+        if: github.event.client_payload.triggering_env != 'prd'
         run: |
           sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/*.yaml
 
       - name: Deploy to GKE
+        if: github.event.client_payload.triggering_env != 'prd'
         run: |
           kubectl apply -R -f overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}
