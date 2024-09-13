@@ -84,8 +84,10 @@ jobs:
       - name: Push Docker Image to Artifact Registry
         run: |
           docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
           docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
-
+          docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
+          
       - name: Update Deployment image URL
         run: |
           sed -i "s|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:.*|image: $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG|g" overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}/*.yaml
