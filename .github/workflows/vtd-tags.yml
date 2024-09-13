@@ -120,7 +120,7 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             https://api.github.com/repos/VitaDairy/vtd-be-ppap/dispatches \
             -d "{ \
-                \"event_type\": \"vtd-be-java-${{ matrix.service }}/refs/remotes/$TRIGGERING_REF~$TRIGGERING_ACTOR\", \
+                \"event_type\": \"vtd-be-java-${{ matrix.service }}/refs/tags/$TAG_NAME~$TRIGGERING_ACTOR\", \
                 \"client_payload\": { \
                   \"triggering_actor\": \"$TRIGGERING_ACTOR\", \
                   \"triggering_ref\": \"$TRIGGERING_REF\", \
