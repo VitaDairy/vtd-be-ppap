@@ -88,7 +88,7 @@ jobs:
           mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
           mv code_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-      
+
       - name: cleanup dbchange
         run: |
           if [ -d "source/src/main/resources/dbchange" ]; then
@@ -102,11 +102,11 @@ jobs:
           mkdir overlay_temp
           mv -v source/overlays/* overlay_temp
           mv overlay_temp/${{ matrix.service }} source/overlays/
-      
+
       - name: Change micro.service.context-path
         working-directory: source
         run: perl -i -pe "s/^micro.service.context-path=\/api/'micro.service.context-path=${{ matrix.path }}'/e" src/main/resources/application.properties
-        
+
       - name: Build and package project
         working-directory: source
         run: mvn -f pom.xml clean install package -DskipTests -q

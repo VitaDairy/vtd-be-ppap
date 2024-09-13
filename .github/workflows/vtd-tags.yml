@@ -4,12 +4,9 @@ on:
   repository_dispatch:
     types:
       - vtd-trigger
-      - refs/tags/**
+      - refs/tags/v*
 
 env:
-  # TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  # TELEGRAM_GROUP_ID: ${{ vars.TELEGRAM_GROUP_ID}}
-  # TELEGRAM_TOPIC_ID: ${{ vars.TELEGRAM_TOPIC_ID}}
   REF_NAME: ${{ github.event.client_payload.ref_name}}
   TAG_NAME: ${{ github.event.client_payload.tag_name}}
   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
@@ -39,6 +36,18 @@ jobs:
           ref: ${{ env.REF_NAME }}
           path: target
 
+      - name: Clone properties file
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.VTD_REPOSITORY_ENV }}
+          token: ${{ secrets.GH_PAT }}
+          path: env
+
+      - name: Switch profile
+        run: |
+          sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" source/src/main/resources/application.properties
+          mv env/v4-java/application-ci.properties source/src/main/resources/application-ci.properties
+
       - name: Setup java 21
         uses: actions/setup-java@v4
         with:
@@ -47,21 +56,20 @@ jobs:
 
       - name: Remove the rest code
         run: |
-          mkdir code_package_temp
-          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_package_temp
-          mv code_package_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_package_temp/auth source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_package_temp/zoo source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_package_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_package_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
-          mv code_package_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mkdir code_temp
+          mv -v source/${{ secrets.SERVICE_PACKAGE_PATH }}/* code_temp
+          mv code_temp/main source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/auth source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/zoo source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/Application.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/ConfigProperties.java source/${{ secrets.SERVICE_PACKAGE_PATH }}/
+          mv code_temp/${{ matrix.service }} source/${{ secrets.SERVICE_PACKAGE_PATH }}/
 
-      - name: Remove the test packages
+      - name: cleanup dbchange
         run: |
-          mkdir test_package_temp
-          mv -v source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/* test_package_temp
-          mv test_package_temp/main source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/
-          mv test_package_temp/${{ matrix.service }} source/${{ secrets.SERVICE_TEST_PACKAGE_PATH }}/
+          mkdir dbchange_temp
+          mv -v source/src/main/resources/dbchange/* dbchange_temp
+          mv dbchange_temp/${{ matrix.service }} source/src/main/resources/dbchange/
 
       - name: Remove the rest overlays
         run: |
@@ -69,12 +77,13 @@ jobs:
           mv -v source/overlays/* overlay_temp
           mv overlay_temp/${{ matrix.service }} source/overlays/
 
+      - name: Change micro.service.context-path
+        working-directory: source
+        run: perl -i -pe "s/^micro.service.context-path=\/api/'micro.service.context-path=${{ matrix.path }}'/e" src/main/resources/application.properties
+
       - name: Build and package project
         working-directory: source
-        run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > src/main/resources/application-dev-base64.properties
-          cat src/main/resources/application-dev-base64.properties | base64 -d > src/main/resources/application-dev.properties
-          mvn -f pom.xml clean install package -q
+        run: mvn -f pom.xml clean install package -DskipTests -q
 
       - name: Move code to the result
         run: |
@@ -83,6 +92,7 @@ jobs:
           rm -rf source/.git
           shopt -s dotglob
           mv -v source/* result/
+          sed -i "s|spring.profiles.active=ci|spring.profiles.active=local|g" result/src/main/resources/application.properties
 
       - name: Push result
         working-directory: result
