@@ -104,3 +104,29 @@ jobs:
           git push origin ${{ env.REF_NAME }} -f
           git tag -a ${{ env.TAG_NAME }} -m 'Bump version to ${{ env.TAG_NAME }}' 
           git push origin ${{ env.TAG_NAME }}
+
+      - name: Trigger build ${{ matrix.service }}
+        working-directory: result
+        run: |
+          TRIGGERING_ACTOR=${{ env.TRIGGERING_ACTOR }}
+          TRIGGERING_REF=${{ env.REF_NAME }}
+          TRIGGERING_SERVICE_NAME=${{ matrix.service }}
+          TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
+          TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.LIBERTY_PPAP_PAT }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/VitaDairy/vtd-be-ppap/dispatches \
+            -d "{ \
+                \"event_type\": \"vtd-be-java-${{ matrix.service }}/refs/remotes/$TRIGGERING_REF~$TRIGGERING_ACTOR\", \
+                \"client_payload\": { \
+                  \"triggering_actor\": \"$TRIGGERING_ACTOR\", \
+                  \"triggering_ref\": \"$TRIGGERING_REF\", \
+                  \"triggering_service_name\": \"$TRIGGERING_SERVICE_NAME\", \
+                  \"triggering_repo\": \"$TRIGGERING_REPOSITORY\", \
+                  \"triggering_env\": \"$TRIGGERING_ENV\", \
+                  \"triggering_version\": \"$TAG_NAME\" \
+                } \
+              }"
