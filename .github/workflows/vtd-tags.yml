@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types:
       - vtd-trigger
-      - refs/tags/v*
+      - refs/tags/v**
 
 env:
   REF_NAME: ${{ github.event.client_payload.ref_name}}
