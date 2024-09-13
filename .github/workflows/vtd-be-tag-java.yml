@@ -84,7 +84,7 @@ jobs:
       - name: Push Docker Image to Artifact Registry
         run: |
           docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
-          docker tag $IMAGE_NAME:latest $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$IMAGE_TAG $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:latest
           docker push $GAR_HOST/$GCP_PROJECT_ID/$GAR_NAME/$IMAGE_NAME:$IMAGE_TAG
 
       # - name: Update Deployment image URL
