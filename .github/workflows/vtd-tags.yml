@@ -43,6 +43,13 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           path: env
 
+      - name: Connect to VPN
+        uses: Boostport/setup-cloudflare-warp@v1
+        with:
+          organization: tesoglobal
+          auth_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          auth_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+
       - name: Switch profile
         run: |
           sed -i "s|spring.profiles.active=local|spring.profiles.active=ci|g" source/src/main/resources/application.properties
