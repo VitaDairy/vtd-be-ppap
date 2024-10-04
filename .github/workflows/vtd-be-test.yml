@@ -19,6 +19,7 @@ jobs:
           organization: tesoglobal
           auth_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           auth_client_secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-      
+
       - name: Telnel check
+        timeout-minutes: 1
         run: telnet 10.26.147.3 5432
