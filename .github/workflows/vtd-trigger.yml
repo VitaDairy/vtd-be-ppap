@@ -116,7 +116,7 @@ jobs:
 
       - name: Build and package project
         working-directory: source
-        run: mvn -f pom.xml clean install package -DskipTests
+        run: mvn -f pom.xml clean install package -DskipTests -q
 
       - name: Move code to the result
         run: |
