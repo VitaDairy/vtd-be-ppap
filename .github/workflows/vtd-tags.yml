@@ -15,7 +15,7 @@ jobs:
   build-and-check:
     name: ${{ matrix.name }}
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include: ${{ fromJson(vars.STRATEGY_MATRIX_SERVICES) }}
