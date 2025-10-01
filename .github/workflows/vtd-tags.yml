@@ -45,6 +45,7 @@ jobs:
 
       - name: Connect to VPN
         uses: Boostport/setup-cloudflare-warp@v1
+        continue-on-error: true
         with:
           organization: tesoglobal
           auth_client_id: ${{ secrets.CF_ACCESS_CLIENT_ID }}
