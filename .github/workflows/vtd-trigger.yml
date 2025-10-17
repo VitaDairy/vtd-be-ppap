@@ -1,14 +1,19 @@
 name: vtd trigger
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref_name:
+      triggering_actor:
+
   repository_dispatch:
     types:
       - vtd-trigger
       - refs/remotes/**
 
 env:
-  REF_NAME: ${{ github.event.client_payload.ref_name}}
-  TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
+  REF_NAME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref_name || github.event_name == 'repository_dispatch' && github.event.client_payload.ref_name }}
+  TRIGGERING_ACTOR: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.triggering_actor || github.event_name == 'repository_dispatch' && github.event.client_payload.triggering_actor }}
 
 jobs:
   build-and-check:
@@ -21,6 +26,10 @@ jobs:
       matrix:
         include: ${{ fromJson(vars.STRATEGY_MATRIX_SERVICES) }}
     steps:
+      - name: Show trigger info
+        run: |
+          echo "REF_NAME: ${{ github.event.inputs.ref_name }}"
+          echo "TRIGGERING_ACTOR: ${{ github.event.inputs.triggering_actor }}"
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -37,8 +46,10 @@ jobs:
         run: |
           HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo '' )
           if [ -z "${HASH_REF}" ]; then
+            echo "Branch ${{ env.REF_NAME }} does not exist. Will checkout main first."
             echo "value=main" >> $GITHUB_OUTPUT
           else
+            echo "Branch ${{ env.REF_NAME }} exists. Will checkout this branch."
             echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT
           fi
 
@@ -49,6 +60,15 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           ref: ${{ steps.target-branch.outputs.value }}
           path: target
+      
+      - name: Create branch if missing
+        id: create-branch
+        if: steps.target-branch.outputs.value == 'main' && env.REF_NAME != 'main'
+        shell: bash
+        run: |
+          cd target
+          git checkout -b ${{ env.REF_NAME }}
+          git push origin ${{ env.REF_NAME }}
 
       - name: Clone properties file
         uses: actions/checkout@v4
