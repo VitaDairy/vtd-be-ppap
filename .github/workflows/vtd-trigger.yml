@@ -69,12 +69,18 @@ jobs:
         id: target-branch
         shell: bash
         run: |
-          if [ ${{ steps.check-target-branch.outputs.value }} == 'main' && ${{ env.REF_NAME }} != 'main' ]; then
+          CHECK_TARGET_BRANCH="${{ steps.check-target-branch.outputs.value }}"
+          REF_NAME="${{ env.REF_NAME }}"
+
+          if [ "$CHECK_TARGET_BRANCH" = "main" ] && [ "$REF_NAME" != "main" ]; then
             cd target
-            git checkout -b ${{ env.REF_NAME }}
-            git push origin ${{ env.REF_NAME }}
+            git checkout -b "$REF_NAME"
+            git push origin "$REF_NAME"
+            echo "Created and switched to new branch $REF_NAME"
+          else
+            echo "Already on branch $REF_NAME"
           fi
-          echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT`
+          echo "value=$REF_NAME" >> $GITHUB_OUTPUT`
 
       - name: Clone properties file
         uses: actions/checkout@v4
