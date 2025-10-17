@@ -80,7 +80,7 @@ jobs:
           else
             echo "Already on branch $REF_NAME"
           fi
-          echo "value=$REF_NAME" >> $GITHUB_OUTPUT`
+          echo "value=$REF_NAME" >> $GITHUB_OUTPUT
 
       - name: Clone properties file
         uses: actions/checkout@v4
