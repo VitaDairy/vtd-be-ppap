@@ -11,13 +11,9 @@ on:
       - vtd-trigger
       - refs/remotes/**
 
-# env:
-#   REF_NAME: ${{ github.event.client_payload.ref_name}}
-#   TRIGGERING_ACTOR: ${{ github.event.client_payload.triggering_actor}}
-
 env:
-  REF_NAME: ${{ github.event.inputs.ref_name}}
-  TRIGGERING_ACTOR: ${{ github.event.inputs.triggering_actor}}
+  REF_NAME: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref_name || github.event_name == 'repository_dispatch' && github.event.client_payload.ref_name }}
+  TRIGGERING_ACTOR: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.triggering_actor || github.event_name == 'repository_dispatch' && github.event.client_payload.triggering_actor }}
 
 jobs:
   build-and-check:
