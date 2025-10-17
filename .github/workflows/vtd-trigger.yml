@@ -32,10 +32,8 @@ jobs:
     steps:
       - name: Show trigger info
         run: |
-          echo "event.name: ${{ github.event.name }}"
-          echo "event_name: ${{ github.event_name }}"
-          echo "REF_NAME: ${{ github.event.inputs.ref_name }}"
-          echo "TRIGGERING_ACTOR: ${{ github.event.inputs.triggering_actor }}"
+          echo "REF_NAME: ${{ env.REF_NAME }}"
+          echo "TRIGGERING_ACTOR: ${{ env.TRIGGERING_ACTOR }}"
       - name: Checkout source
         uses: actions/checkout@v4
         with:
