@@ -30,6 +30,10 @@ jobs:
       matrix:
         include: ${{ fromJson(vars.STRATEGY_MATRIX_SERVICES) }}
     steps:
+      - name: Debug payload
+        run: |
+          echo "REF_NAME: ${{ github.event.inputs.ref_name }}"
+          echo "TRIGGERING_ACTOR: ${{ github.event.inputs.triggering_actor }}"
       - name: Checkout source
         uses: actions/checkout@v4
         with:
