@@ -46,10 +46,10 @@ jobs:
         run: |
           HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo '' )
           if [ -z "${HASH_REF}" ]; then
-            echo "Branch ${{{ env.REF_NAME }}} does not exist. Will checkout main first."
+            echo "Branch ${{ env.REF_NAME }} does not exist. Will checkout main first."
             echo "value=main" >> $GITHUB_OUTPUT
           else
-            echo "Branch ${{{ env.REF_NAME }}} exists. Will checkout this branch."
+            echo "Branch ${{ env.REF_NAME }} exists. Will checkout this branch."
             echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT
           fi
 
