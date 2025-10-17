@@ -32,7 +32,8 @@ jobs:
     steps:
       - name: Show trigger info
         run: |
-          echo "event detail: ${{ github.event }}"
+          echo "event.name: ${{ github.event.name }}"
+          echo "event_name: ${{ github.event_name }}"
           echo "REF_NAME: ${{ github.event.inputs.ref_name }}"
           echo "TRIGGERING_ACTOR: ${{ github.event.inputs.triggering_actor }}"
       - name: Checkout source
