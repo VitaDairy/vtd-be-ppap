@@ -1,6 +1,11 @@
 name: vtd trigger
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or tag to deploy"
+        required: true
   repository_dispatch:
     types:
       - vtd-trigger
