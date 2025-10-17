@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       ref_name:
+        description: "Branch or tag to deploy from source repo"
+        required: true
       triggering_actor:
+        description: "Actor who trigger workflow from source repo"
+        required: true
 
   repository_dispatch:
     types:
