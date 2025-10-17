@@ -43,7 +43,7 @@ jobs:
           path: source
 
       - name: Check target source
-        id: target-branch
+        id: check-target-branch
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -62,17 +62,19 @@ jobs:
         with:
           repository: ${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
           token: ${{ secrets.GH_PAT }}
-          ref: ${{ steps.target-branch.outputs.value }}
+          ref: ${{ steps.check-target-branch.outputs.value }}
           path: target
       
       - name: Create branch if missing
-        id: create-branch
-        if: steps.target-branch.outputs.value == 'main' && env.REF_NAME != 'main'
+        id: target-branch
         shell: bash
         run: |
-          cd target
-          git checkout -b ${{ env.REF_NAME }}
-          git push origin ${{ env.REF_NAME }}
+          if [ ${{ steps.check-target-branch.outputs.value }} == 'main' && ${{ env.REF_NAME }} != 'main' ]; then
+            cd target
+            git checkout -b ${{ env.REF_NAME }}
+            git push origin ${{ env.REF_NAME }}
+          fi
+          echo "value=${{ env.REF_NAME }}" >> $GITHUB_OUTPUT`
 
       - name: Clone properties file
         uses: actions/checkout@v4
