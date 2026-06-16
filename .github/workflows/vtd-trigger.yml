@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     outputs:
-      env: ${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
+      env: ${{ (steps.target-branch.outputs.value == 'main' || steps.target-branch.outputs.value == 'develop') && 'dev' || 'stg' }}
     strategy:
       matrix:
         include: ${{ fromJson(vars.STRATEGY_MATRIX_SERVICES) }}
@@ -188,7 +188,7 @@ jobs:
           TRIGGERING_REF=${{ env.REF_NAME }}
           TRIGGERING_SERVICE_NAME=${{ matrix.service }}
           TRIGGERING_REPOSITORY=${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}
-          TRIGGERING_ENV=${{ steps.target-branch.outputs.value == 'main' && 'dev' || 'stg' }}
+          TRIGGERING_ENV=${{ (steps.target-branch.outputs.value == 'main' || steps.target-branch.outputs.value == 'develop') && 'dev' || 'stg' }}
           TRIGHERING_VERSION=$(git rev-parse HEAD)
           TRIGHERING_HASH=$(git rev-parse HEAD)
           curl -L \
