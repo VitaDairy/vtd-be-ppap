@@ -48,7 +48,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          HASH_REF=$(git ls-remote --heads --quiet --exit-code https://${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo '' )
+          HASH_REF=$(git ls-remote --heads --quiet --exit-code https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ secrets.VTD_REPOSITORY_TARGET }}${{ matrix.service }}.git ${{ env.REF_NAME }} || echo '' )
           if [ -z "${HASH_REF}" ]; then
             echo "Branch ${{ env.REF_NAME }} does not exist. Will checkout main first."
             echo "value=main" >> $GITHUB_OUTPUT
