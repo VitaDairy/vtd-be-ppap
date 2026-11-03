@@ -96,4 +96,5 @@ jobs:
 
       - name: Deploy to GKE
         run: |
+          unset CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE
           kubectl apply -R -f overlays/${{ env.TRIGGERING_SERVICE_NAME }}/${{ env.SPRING_PROFILES_ACTIVE }}
